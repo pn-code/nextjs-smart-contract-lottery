@@ -3,13 +3,14 @@ import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
 
 export default function Navbar() {
-  const { enableWeb3, account, isWeb3Enabled, Moralis, deactivateWeb3 } =
+  const { enableWeb3, account, isWeb3Enabled, Moralis, deactivateWeb3, isWeb3EnableLoading} =
     useMoralis();
 
   // Check for connection and allow reconnect if user recently connected
   useEffect(() => {
     if (isWeb3Enabled) return;
 
+    // If window is present, check localStorage for recent connects
     if (typeof window !== "undefined") {
       if (window.localStorage.getItem("connected")) {
         enableWeb3();
@@ -46,7 +47,7 @@ export default function Navbar() {
           Connected to {account.slice(0, 4)}...{account.slice(38)}
         </div>
       ) : (
-        <button onClick={handleConnectWallet}>Connect</button>
+        <button className="bg-indigo-600 font-semibold px-4 py-1 rounded-md text-white hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed" onClick={handleConnectWallet} disabled={isWeb3EnableLoading}>Connect</button>
       )}
     </nav>
   );
