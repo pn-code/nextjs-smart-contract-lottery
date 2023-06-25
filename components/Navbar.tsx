@@ -3,8 +3,10 @@ import { useEffect } from "react";
 import { useMoralis } from "react-moralis";
 
 export default function Navbar() {
-  const { enableWeb3, account, isWeb3Enabled } = useMoralis();
+  const { enableWeb3, account, isWeb3Enabled, Moralis, deactivateWeb3 } =
+    useMoralis();
 
+  // Check for connection and allow reconnect if user recently connected
   useEffect(() => {
     if (isWeb3Enabled) return;
 
@@ -15,10 +17,23 @@ export default function Navbar() {
     }
   }, [isWeb3Enabled]);
 
+  // Do not allow user to be reprompted by wallet if they choose to disconnect.
+  useEffect(() => {
+    Moralis.onAccountChanged((account) => {
+      console.log(`Account changed to ${account}`);
+      // If the account is null, user disconnected. Deactivate to not reprompt user.
+      if (account == null) {
+        window.localStorage.removeItem("connected");
+        deactivateWeb3();
+        console.log("User has disconnected their wallet.")
+      }
+    });
+  }, []);
+
   const handleConnectWallet = async () => {
     await enableWeb3();
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("connected", "inject");
+      window.localStorage.setItem("connected", "injected");
     }
   };
 
