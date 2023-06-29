@@ -80,9 +80,34 @@ export default function LotterySection() {
     };
 
     return (
-        <div className="w-full h-screen flex flex-col justify-center items-center">
+        <div className="w-full md:h-[calc(100vh-400px)] flex flex-col p-4 md:justify-center md:items-center">
             {raffleAddress ? (
                 <div className="flex flex-col gap-4">
+                    <header>
+                        <h2 className="text-lg font-semibold">Lottery</h2>
+                        <span className="text-sm text-indigo-700 font-semibold">
+                            Lottery Statistics
+                        </span>
+                    </header>
+                    <section className="flex gap-2">
+                        <h3 className="font-semibold">Entrance Fee:</h3>
+                        <span>
+                            {ethers.utils.formatUnits(entranceFee, "ether")}
+                            ETH
+                        </span>
+                    </section>
+                    <section className="flex gap-2">
+                        <h3 className="font-semibold">Number of Players:</h3>
+                        <span>{numberOfPlayers}</span>
+                    </section>
+
+                    <section className="flex flex-col md:flex-row md:gap-2">
+                        <h3 className="font-semibold">Recent Winner: </h3>
+                        <span className="text-xs md:text-[16px] md:mt-1">
+                            {recentWinner}
+                        </span>
+                    </section>
+
                     <button
                         className="bg-blue-600 text-white px-4 py-2 rounded-md text-lg font-semibold hover:bg-blue-700"
                         onClick={async () =>
@@ -94,13 +119,6 @@ export default function LotterySection() {
                     >
                         Enter Raffle
                     </button>
-                    <section>
-                        Entrance Fee:{" "}
-                        {ethers.utils.formatUnits(entranceFee, "ether")}
-                        ETH
-                    </section>
-                    Number of Players: {numberOfPlayers}
-                    Recent Winner: {recentWinner}
                 </div>
             ) : (
                 <div>No Raffle Address Detected</div>
