@@ -14,7 +14,11 @@ export default function LotterySection() {
     const { chainId: chainIdHex, isWeb3Enabled } = useMoralis();
     const chainId = parseInt(chainIdHex as string);
     const raffleAddress =
-        chainId in contractAddresses ? contractAddresses[chainId][0] : null;
+        chainId.toString() in contractAddresses
+            ? contractAddresses[
+                  chainId.toString() as keyof typeof contractAddresses
+              ][0]
+            : undefined;
 
     const dispatch = useNotification();
 
