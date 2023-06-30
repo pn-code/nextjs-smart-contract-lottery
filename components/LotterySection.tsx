@@ -11,7 +11,7 @@ export default function LotterySection() {
     const [numberOfPlayers, setNumberOfPlayers] = useState("0");
     const [recentWinner, setRecentWinner] = useState("0");
 
-    const { chainId: chainIdHex, isWeb3Enabled } = useMoralis();
+    const { chainId: chainIdHex, isWeb3Enabled, provider } = useMoralis();
     const chainId = parseInt(chainIdHex as string);
     const raffleAddress =
         chainId.toString() in contractAddresses
@@ -93,6 +93,12 @@ export default function LotterySection() {
                             Lottery Statistics
                         </span>
                     </header>
+
+                    <section className="flex gap-2">
+                        <h3 className="font-semibold">Jackpot</h3>
+                        <span>{Number(numberOfPlayers) * 0.01}ETH</span>
+                    </section>
+
                     <section className="flex gap-2">
                         <h3 className="font-semibold">Entrance Fee:</h3>
                         <span>
@@ -100,6 +106,7 @@ export default function LotterySection() {
                             ETH
                         </span>
                     </section>
+
                     <section className="flex gap-2">
                         <h3 className="font-semibold">Number of Players:</h3>
                         <span>{numberOfPlayers}</span>
