@@ -10,6 +10,8 @@ export default function LotterySection() {
     const [entranceFee, setEntranceFee] = useState("0");
     const [numberOfPlayers, setNumberOfPlayers] = useState("0");
     const [recentWinner, setRecentWinner] = useState("0");
+    const [timeTillNextUpkeep, setTimeTillNextUpkeep] = useState(0);
+    const [raffleState, setRaffleState] = useState("0");
 
     const { chainId: chainIdHex, isWeb3Enabled, provider } = useMoralis();
     const chainId = parseInt(chainIdHex as string);
@@ -51,6 +53,20 @@ export default function LotterySection() {
         params: {},
     });
 
+    const { runContractFunction: getLastTimeStamp } = useWeb3Contract({
+        abi: abi,
+        contractAddress: raffleAddress,
+        functionName: "getLastTimeStamp",
+        params: {},
+    });
+
+    const { runContractFunction: getRaffleState } = useWeb3Contract({
+        abi: abi,
+        contractAddress: raffleAddress,
+        functionName: "getRaffleState",
+        params: {},
+    });
+
     useEffect(() => {
         if (isWeb3Enabled) {
             updateUI();
@@ -61,10 +77,16 @@ export default function LotterySection() {
         const entranceFeeFromContract = (await getEntranceFee()) as string;
         const numPlayersFromContract = (await getNumberOfPlayers()) as string;
         const recentWinnerFromContract = (await getRecentWinner()) as string;
+        const lastTimestampFromContract = (await getLastTimeStamp()) as string;
+        const raffleStateFromContract = (await getRaffleState()) as string;
 
         setEntranceFee(entranceFeeFromContract.toString());
         setNumberOfPlayers(numPlayersFromContract.toString());
         setRecentWinner(recentWinnerFromContract.toString());
+        setTimeTillNextUpkeep(
+            Number(lastTimestampFromContract.toString()) - getCurrentTimeUnix()
+        );
+        setRaffleState(raffleStateFromContract.toString());
     };
 
     const handleSuccess = async function (tx: any) {
@@ -83,8 +105,14 @@ export default function LotterySection() {
         });
     };
 
+    const getCurrentTimeUnix = () => {
+        const currentDate = new Date();
+        const currentTimeUnix = Math.floor(currentDate.getTime() / 1000);
+        return currentTimeUnix;
+    };
+
     return (
-        <div className="w-full md:h-[calc(100vh-400px)] flex flex-col p-4 md:justify-center md:items-center">
+        <div className="w-full md:h-[calc(100vh-400px)] flex flex-col p-4 md:justify-center md:items-center md:my-20">
             {raffleAddress ? (
                 <div className="flex flex-col gap-4">
                     <header>
@@ -117,6 +145,24 @@ export default function LotterySection() {
                         <span className="text-xs md:text-[16px] md:mt-1">
                             {recentWinner}
                         </span>
+                    </section>
+
+                    <section className="flex flex-col md:flex-row md:gap-2">
+                        <h3 className="font-semibold">Time Left: </h3>
+                        <span
+                            className={
+                                timeTillNextUpkeep > 0
+                                    ? "text-red-600"
+                                    : "text-green-600"
+                            }
+                        >
+                            {timeTillNextUpkeep} seconds
+                        </span>
+                    </section>
+
+                    <section className="flex flex-col md:flex-row md:gap-2">
+                        <h3 className="font-semibold">Raffle State: </h3>
+                        <span>{raffleState ? "OPEN" : "CALCULATING"}</span>
                     </section>
 
                     <button
